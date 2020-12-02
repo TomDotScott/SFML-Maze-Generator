@@ -1,10 +1,11 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
+#include "constants.h"
 
 int main()
 {
-	sf::RenderWindow window(sf::VideoMode(800, 600), "Maze Generator: Prim's Algorithm");
-
+	sf::RenderWindow window(sf::VideoMode(constants::k_screenWidth, constants::k_screenHeight), "Maze Generator: Prim's Algorithm");
+	
 	while (window.isOpen())
 	{
 		// Handle any pending SFML events
