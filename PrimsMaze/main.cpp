@@ -1,6 +1,8 @@
 #include <iostream>
 #include <vector>
 #include <SFML/Graphics.hpp>
+#include <thread>
+
 #include "constants.h"
 #include "Vector2i.h"
 
@@ -84,6 +86,8 @@ void render(std::vector<Vector2>& maze, sf::RenderWindow& window)
 			}
 		}
 	}
+
+	window.display();
 }
 
 void prims_algorithm(std::vector<Vector2>& maze, sf::RenderWindow& window)
@@ -154,19 +158,14 @@ void prims_algorithm(std::vector<Vector2>& maze, sf::RenderWindow& window)
 			{
 				nodesToVisit.emplace_back(nextPath.y, below);
 			}
-
-			/*std::cout << "\nVISITED INDICES (SIZE: " << visitedIndices.size() << ")" << std::endl;
-			for (auto& item : visitedIndices)
-			{
-				std::cout << item << ", ";
-			}
-
-			std::cout << "\nNodes to visit: " << std::endl;
-			for (auto& item : nodesToVisit)
-			{
-				std::cout << item.y << ", ";
-			}*/
 		}
+	}
+
+	for(size_t i = 0; i < maze.size(); ++i)
+	{
+		auto currentMazeState = std::vector<Vector2>(maze.begin(), maze.begin() + i);
+		render(currentMazeState, window);
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 	}
 }
 
