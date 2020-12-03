@@ -45,6 +45,7 @@ int index_of_item(std::vector<T>& vec, T value)
 
 void render(std::vector<Vector2>& maze, sf::RenderWindow& window)
 {
+	window.clear();
 	sf::RectangleShape border{ {constants::k_screenWidth - 6, constants::k_screenHeight - 6} };
 	border.setPosition(3, 3);
 	border.setFillColor(sf::Color::Black);
@@ -58,15 +59,25 @@ void render(std::vector<Vector2>& maze, sf::RenderWindow& window)
 		{
 			// only worry about the tile to the right and the tile below
 			// to avoid drawing lines twice
-			const int upper{ y * constants::k_mazeWidth + x };
+			const int current{ y * constants::k_mazeWidth + x };
 			const int lower{ (y + 1) * constants::k_mazeWidth + x };
 
 			// if the maze doesn't contain the path, draw a wall
-			if(!is_item_in_vector(maze, Vector2(upper, lower)))
+			if(!is_item_in_vector(maze, Vector2(current, lower)))
 			{
 				sf::Vertex line[]
 				{
 					sf::Vertex({static_cast<float>(x * constants::k_tileWidth), static_cast<float>((y + 1) * constants::k_tileHeight)}),
+					sf::Vertex({static_cast<float>((x + 1) * constants::k_tileWidth), static_cast<float>((y + 1) * constants::k_tileHeight)})
+				};
+				window.draw(line, 2, sf::Lines);
+			}
+
+			if(!is_item_in_vector(maze, Vector2(current, current + 1)))
+			{
+				sf::Vertex line[]
+				{
+					sf::Vertex({static_cast<float>((x + 1) * constants::k_tileWidth), static_cast<float>(y * constants::k_tileHeight)}),
 					sf::Vertex({static_cast<float>((x + 1) * constants::k_tileWidth), static_cast<float>((y + 1) * constants::k_tileHeight)})
 				};
 				window.draw(line, 2, sf::Lines);
@@ -112,12 +123,10 @@ void prims_algorithm(std::vector<Vector2>& maze, sf::RenderWindow& window)
 			if(nextPath.x > nextPath.y)
 			{
 				maze.emplace_back(nextPath.y, nextPath.x);
-				//render(maze, window);
 			} else
 			{
 				// add the node to the maze
 				maze.emplace_back(nextPath);
-				//render(maze, window);
 			}
 			
 			// Find the index of the cell above the current cell
@@ -170,7 +179,7 @@ int main()
 	{
 		// Handle any pending SFML events
 		// These cover keyboard, mouse,joystick etc.
-		sf::Event event;
+		sf::Event event{};
 		while (window.pollEvent(event))
 		{
 			switch (event.type)
