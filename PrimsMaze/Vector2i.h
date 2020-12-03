@@ -9,6 +9,7 @@ public:
 	Vector2 operator*(int rhs) const;
 	Vector2 operator-(const Vector2& rhs) const;
 	bool operator==(Vector2& rhs) const;
+	bool operator==(const Vector2& rhs) const;
 	bool operator!=(Vector2& rhs) const;
 
 	friend std::ostream& operator<<(std::ostream& os, const Vector2& dt);

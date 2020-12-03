@@ -43,7 +43,39 @@ int index_of_item(std::vector<T>& vec, T value)
 	return -1;
 }
 
-void prims_algorithm()
+void render(std::vector<Vector2>& maze, sf::RenderWindow& window)
+{
+	sf::RectangleShape border{ {constants::k_screenWidth - 6, constants::k_screenHeight - 6} };
+	border.setPosition(3, 3);
+	border.setFillColor(sf::Color::Black);
+	border.setOutlineThickness(3);
+	window.draw(border);
+
+	// Draw the maze
+	for (int y = 0; y < constants::k_mazeHeight; ++y)
+	{
+		for (int x = 0; x < constants::k_mazeWidth; ++x)
+		{
+			// only worry about the tile to the right and the tile below
+			// to avoid drawing lines twice
+			const int upper{ y * constants::k_mazeWidth + x };
+			const int lower{ (y + 1) * constants::k_mazeWidth + x };
+
+			// if the maze doesn't contain the path, draw a wall
+			if(!is_item_in_vector(maze, Vector2(upper, lower)))
+			{
+				sf::Vertex line[]
+				{
+					sf::Vertex({static_cast<float>(x * constants::k_tileWidth), static_cast<float>((y + 1) * constants::k_tileHeight)}),
+					sf::Vertex({static_cast<float>((x + 1) * constants::k_tileWidth), static_cast<float>((y + 1) * constants::k_tileHeight)})
+				};
+				window.draw(line, 2, sf::Lines);
+			}
+		}
+	}
+}
+
+void prims_algorithm(std::vector<Vector2>& maze, sf::RenderWindow& window)
 {
 	std::vector<int> visitedIndices{ 0 };
 
@@ -76,6 +108,18 @@ void prims_algorithm()
 			// add the node to the visited list
 			visitedIndices.push_back(nextPath.y);
 
+			// if the path is from right to left, or bottom to top, flip it
+			if(nextPath.x > nextPath.y)
+			{
+				maze.emplace_back(nextPath.y, nextPath.x);
+				//render(maze, window);
+			} else
+			{
+				// add the node to the maze
+				maze.emplace_back(nextPath);
+				//render(maze, window);
+			}
+			
 			// Find the index of the cell above the current cell
 			const auto above = nextPath.y - constants::k_mazeWidth;
 			// make sure the above is valid
@@ -102,7 +146,7 @@ void prims_algorithm()
 				nodesToVisit.emplace_back(nextPath.y, below);
 			}
 
-			std::cout << "\nVISITED INDICES (SIZE: " << visitedIndices.size() << ")" << std::endl;
+			/*std::cout << "\nVISITED INDICES (SIZE: " << visitedIndices.size() << ")" << std::endl;
 			for (auto& item : visitedIndices)
 			{
 				std::cout << item << ", ";
@@ -112,7 +156,7 @@ void prims_algorithm()
 			for (auto& item : nodesToVisit)
 			{
 				std::cout << item.y << ", ";
-			}
+			}*/
 		}
 	}
 }
@@ -120,7 +164,8 @@ void prims_algorithm()
 int main()
 {
 	sf::RenderWindow window(sf::VideoMode(constants::k_screenWidth, constants::k_screenHeight), "Maze Generator: Prim's Algorithm");
-	prims_algorithm();
+	std::vector<Vector2> maze;
+	prims_algorithm(maze, window);
 	while (window.isOpen())
 	{
 		// Handle any pending SFML events
@@ -141,6 +186,7 @@ int main()
 		// We must clear the window each time around the loop
 		window.clear();
 
+		render(maze, window);
 
 
 		// Get the window to display its contents

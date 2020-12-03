@@ -29,6 +29,11 @@ bool Vector2::operator==(Vector2& rhs) const
 	return x == rhs.x && y == rhs.y;
 }
 
+bool Vector2::operator==(const Vector2& rhs) const
+{
+	return x == rhs.x && y == rhs.y;
+}
+
 bool Vector2::operator!=(Vector2& rhs) const
 {
 	return x != rhs.x || y != rhs.y;
